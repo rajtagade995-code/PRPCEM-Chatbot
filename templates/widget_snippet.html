@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRPCEM Website Integration Snippet</title>
+  <link rel="icon" href="/static/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .integration-wrapper {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .code-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.88rem;
+      color: #e6edf3;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="chatbot-header">
+    <div class="header-left">
+      <div class="college-emblem">
+        <img src="/static/images/logo.svg" alt="PRPCEM">
+      </div>
+      <div class="header-titles">
+        <h1>PRPCEM College Assistant Integration</h1>
+        <div class="subtitle">Official Website Floating Widget & Button Snippets</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="/" class="btn btn-primary" style="text-decoration: none;">← Open Standalone Chatbot</a>
+    </div>
+  </header>
+
+  <main class="integration-wrapper">
+    <div class="panel-card">
+      <h2>PRPCEM Official Website Embed Code</h2>
+      <p style="color: var(--text-secondary); margin: 8px 0 16px 0;">
+        Add either of the following snippets to the official PRPCEM website (<code>https://prpotepatilengg.ac.in/</code>) to connect students directly to the standalone assistant.
+      </p>
+
+      <h3>Option 1: Modern Floating Button (Bottom-Right)</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Place this right before the closing <code>&lt;/body&gt;</code> tag of any official college webpage:
+      </p>
+      <div class="code-box">
+&lt;!-- PRPCEM Assistant Floating Widget Button --&gt;
+&lt;div id="prpcem-assistant-btn-container" style="position: fixed; bottom: 25px; right: 25px; z-index: 999999;"&gt;
+  &lt;a href="{{ request.host_url.rstrip('/') }}" 
+     target="_blank" 
+     rel="noopener"
+     style="display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; font-weight: 600; box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4); transition: transform 0.2s ease, box-shadow 0.2s ease;"
+     onmouseover="this.style.transform='scale(1.05)'"
+     onmouseout="this.style.transform='scale(1)'"&gt;
+    &lt;span style="font-size: 20px;"&gt;💬&lt;/span&gt;
+    &lt;span&gt;Ask PRPCEM Assistant&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/div&gt;
+      </div>
+
+      <h3 style="margin-top: 1.5rem;">Option 2: Navigation Bar Link</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Add to the college navigation menu or top announcement bar:
+      </p>
+      <div class="code-box">
+&lt;!-- PRPCEM Assistant Nav Button --&gt;
+&lt;a href="{{ request.host_url.rstrip('/') }}" target="_blank" class="nav-link btn-prpcem-assistant"&gt;
+  🎓 Ask PRPCEM Assistant
+&lt;/a&gt;
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/theme.js"></script>
+</body>
+</html>

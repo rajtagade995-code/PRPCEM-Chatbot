@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRPCEM Assistant - Administrator Dashboard</title>
+  <link rel="icon" href="/static/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .admin-layout {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg-primary);
+    }
+    .admin-sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-brand {
+      height: 70px;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-brand img {
+      width: 36px;
+      height: 36px;
+    }
+    .sidebar-brand-text h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .sidebar-brand-text span {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition-fast);
+      width: 100%;
+    }
+    .nav-tab-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    .nav-tab-btn.active {
+      background: rgba(2, 132, 199, 0.15);
+      color: var(--accent-secondary);
+      font-weight: 600;
+      border-left: 3px solid var(--accent-primary);
+    }
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .admin-topbar {
+      height: 70px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      flex-shrink: 0;
+    }
+    .topbar-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .admin-content {
+      padding: 2rem;
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Stats Tiles */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card .label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    /* Panels & Tables */
+    .panel-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .panel-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .data-table-wrapper {
+      overflow-x: auto;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    .data-table th {
+      background: var(--bg-tertiary);
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .badge-primary { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
+
+    /* Crawler Live Banner */
+    .crawler-banner {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .crawler-status-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <img src="/static/images/logo.svg" alt="PRPCEM">
+        <div class="sidebar-brand-text">
+          <h2>PRPCEM Admin</h2>
+          <span>College Information Control</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-tab-btn active" data-tab="tabOverview">
+          📊 Dashboard Overview
+        </button>
+        <button class="nav-tab-btn" data-tab="tabCrawler">
+          🕷 Web Crawler Center
+        </button>
+        <button class="nav-tab-btn" data-tab="tabTimings">
+          🕐 College Information & Timing
+        </button>
+        <button class="nav-tab-btn" data-tab="tabCutoffs">
+          📈 Cutoffs Management
+        </button>
+        <button class="nav-tab-btn" data-tab="tabKnowledge">
+          💡 Verified Knowledge Base
+        </button>
+        <button class="nav-tab-btn" data-tab="tabPages">
+          📄 Crawled Pages & PDFs
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="btn btn-secondary" style="text-align: center; text-decoration: none;">
+          ↗ Open Assistant
+        </a>
+        <a href="/admin/logout" class="btn btn-danger" style="text-align: center; text-decoration: none;">
+          Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Admin Content Area -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-title">
+          <h1 id="pageTitle">Dashboard Overview</h1>
+        </div>
+        <div>
+          <button id="themeBtn" class="btn-icon" title="Change Theme">🎨</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- =========================================================
+             TAB 1: DASHBOARD OVERVIEW
+             ========================================================= -->
+        <section id="tabOverview" class="tab-content active">
+          <!-- Statistics Cards (Requirement #46) -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="label">Total Crawled Pages</div>
+              <div class="value" id="statPages">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Total Discovered PDFs</div>
+              <div class="value" id="statPDFs">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Verified Knowledge</div>
+              <div class="value" id="statKnowledge">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Cutoff Records</div>
+              <div class="value" id="statCutoffs">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Total Interactions</div>
+              <div class="value" id="statChats">0</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>System Overview & Status</h3>
+              <button class="btn btn-secondary" onclick="loadStats()">↻ Refresh Stats</button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              <strong>P. R. Pote Patil College of Engineering & Management (PRPCEM), Amravati</strong><br>
+              Official Website: <a href="https://prpotepatilengg.ac.in/" target="_blank" style="color: var(--accent-secondary);">https://prpotepatilengg.ac.in/</a><br>
+              Architecture: <strong>Rule-Based Keyword Matching + SQLite Database + Web Crawling (Zero Machine Learning / No Paid APIs)</strong><br>
+              Last Full Crawler Run: <span id="statLastCrawl" style="color: var(--text-primary); font-weight: 600;">Never</span>
+            </p>
+          </div>
+        </section>
+
+        <!-- =========================================================
+             TAB 2: CRAWLER CONTROL CENTER
+             ========================================================= -->
+        <section id="tabCrawler" class="tab-content" style="display: none;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Web Crawler Management (Requirement #7, #8, #55)</h3>
+            </div>
+
+            <!-- Crawler Live Banner -->
+            <div class="crawler-banner">
+              <div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;">Crawler Status</div>
+                <div id="crawlerLiveMsg" class="crawler-status-text">Ready to crawl</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button id="btnStartCrawl" class="btn btn-primary">Start Crawl</button>
+                <button id="btnUpdateData" class="btn btn-secondary">Update Website Data</button>
+                <button id="btnStopCrawl" class="btn btn-danger" style="display: none;">Stop Crawl</button>
+              </div>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+              <p>• <strong>Approved Domains Whitelist:</strong> <code>prpotepatilengg.ac.in</code></p>
+              <p>• <strong>Crawl Depth Limit:</strong> 5 levels</p>
+              <p>• <strong>Max Pages Limit:</strong> 500 pages</p>
+              <p>• <strong>Change Detection:</strong> Computes SHA-256 content hashes to update modified pages and bypass unchanged ones.</p>
+              <p>• <strong>Manual Knowledge Protection:</strong> Manual verified entries are never overwritten by the crawler.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================
+             TAB 3: COLLEGE INFORMATION & TIMINGS
+             ========================================================= -->
+        <section id="tabTimings" class="tab-content" style="display: none;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>College Information & Timings (Requirement #11, #12, #50)</h3>
+              <button id="btnSaveCollegeInfo" class="btn btn-primary">Save Changes</button>
+            </div>
+            
+            <form id="collegeInfoForm">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group">
+                  <label>College Timing (Verified Default: 10:30 AM to 5:50 PM)</label>
+                  <input type="text" id="info_college_timing" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Administrative Office Timing</label>
+                  <input type="text" id="info_office_timing" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Central Library Timing</label>
+                  <input type="text" id="info_library_timing" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Examination Office Timing</label>
+                  <input type="text" id="info_exam_office_timing" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Admission Office Timing</label>
+                  <input type="text" id="info_admission_office_timing" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Official Helpline Numbers</label>
+                  <input type="text" id="info_college_phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Official Email</label>
+                  <input type="text" id="info_college_email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>T&P Cell Email</label>
+                  <input type="text" id="info_tpo_email" class="form-control" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Official Campus Address</label>
+                <textarea id="info_college_address" class="form-control" rows="2" required></textarea>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- =========================================================
+             TAB 4: CUTOFFS MANAGEMENT
+             ========================================================= -->
+        <section id="tabCutoffs" class="tab-content" style="display: none;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Year-Wise & CAP Round Cutoffs (Requirement #13 - #21, #49)</h3>
+              <button id="btnOpenAddCutoff" class="btn btn-primary">+ Add Cutoff Record</button>
+            </div>
+
+            <div class="data-table-wrapper">
+              <table class="data-table" id="cutoffsTable">
+                <thead>
+                  <tr>
+                    <th>Academic Year</th>
+                    <th>Branch</th>
+                    <th>CAP Round</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Closing Score</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="cutoffsTableBody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================
+             TAB 5: KNOWLEDGE BASE MANAGEMENT
+             ========================================================= -->
+        <section id="tabKnowledge" class="tab-content" style="display: none;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Verified Knowledge Base (Requirement #48)</h3>
+              <button id="btnOpenAddKnowledge" class="btn btn-primary">+ Add Knowledge Entry</button>
+            </div>
+
+            <div class="data-table-wrapper">
+              <table class="data-table" id="knowledgeTable">
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Category</th>
+                    <th>Keywords</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="knowledgeTableBody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================
+             TAB 6: CRAWLED PAGES & DOCUMENTS
+             ========================================================= -->
+        <section id="tabPages" class="tab-content" style="display: none;">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Crawled Web Pages</h3>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>URL</th>
+                    <th>Last Crawled</th>
+                  </tr>
+                </thead>
+                <tbody id="pagesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Discovered Official PDFs</h3>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Document Title</th>
+                    <th>URL</th>
+                    <th>Last Processed</th>
+                  </tr>
+                </thead>
+                <tbody id="docsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Add / Edit Cutoff -->
+  <div id="cutoffModal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 540px;">
+      <div class="modal-head">
+        <h3 id="cutoffModalTitle">Add Cutoff Entry</h3>
+        <button onclick="closeModal('cutoffModal')" class="btn-icon" style="border:none;">✕</button>
+      </div>
+      <div class="modal-content">
+        <form id="cutoffForm">
+          <input type="hidden" id="cutoff_id">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="form-group">
+              <label>Academic Year</label>
+              <input type="text" id="cutoff_year" class="form-control" placeholder="2025-26" required>
+            </div>
+            <div class="form-group">
+              <label>CAP Round</label>
+              <select id="cutoff_round" class="form-control" required>
+                <option value="1">CAP Round 1</option>
+                <option value="2">CAP Round 2</option>
+                <option value="3">CAP Round 3</option>
+                <option value="4">Spot Round</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Branch</label>
+              <input type="text" id="cutoff_branch" class="form-control" placeholder="Computer Science and Engineering" required>
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="cutoff_category" class="form-control" required>
+                <option value="OPEN">OPEN</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="EWS">EWS</option>
+                <option value="TFWS">TFWS</option>
+                <option value="VJ">VJ</option>
+                <option value="NT-B">NT-B</option>
+                <option value="NT-C">NT-C</option>
+                <option value="NT-D">NT-D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cutoff Type</label>
+              <input type="text" id="cutoff_type" class="form-control" value="Percentile" required>
+            </div>
+            <div class="form-group">
+              <label>Cutoff Value</label>
+              <input type="text" id="cutoff_value" class="form-control" placeholder="88.45" required>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label>Official Source URL</label>
+            <input type="url" id="cutoff_source_url" class="form-control" value="https://fe2025.mahacet.org/" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeModal('cutoffModal')" class="btn btn-secondary">Cancel</button>
+        <button id="btnSaveCutoff" class="btn btn-primary">Save Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Knowledge -->
+  <div id="knowledgeModal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-head">
+        <h3 id="knowledgeModalTitle">Add Verified Knowledge</h3>
+        <button onclick="closeModal('knowledgeModal')" class="btn-icon" style="border:none;">✕</button>
+      </div>
+      <div class="modal-content">
+        <form id="knowledgeForm">
+          <input type="hidden" id="knowledge_id">
+          <div class="form-group">
+            <label>Question</label>
+            <input type="text" id="know_question" class="form-control" placeholder="What is PRPCEM college timing?" required>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="form-group">
+              <label>Category / Intent</label>
+              <input type="text" id="know_category" class="form-control" placeholder="department_hod" required>
+            </div>
+            <div class="form-group">
+              <label>Keywords (space separated)</label>
+              <input type="text" id="know_keyword" class="form-control" placeholder="hod cse head" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="form-group">
+              <label>Department (Optional)</label>
+              <input type="text" id="know_department" class="form-control" placeholder="Computer Science and Engineering">
+            </div>
+            <div class="form-group">
+              <label>Academic Year</label>
+              <input type="text" id="know_year" class="form-control" value="2025-26">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Verified Answer</label>
+            <textarea id="know_answer" class="form-control" rows="4" placeholder="PRPCEM college timing is 10:30 AM to 5:50 PM." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Official Source URL</label>
+            <input type="url" id="know_source_url" class="form-control" value="https://prpotepatilengg.ac.in/" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeModal('knowledgeModal')" class="btn btn-secondary">Cancel</button>
+        <button id="btnSaveKnowledge" class="btn btn-primary">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/theme.js"></script>
+  <script>
+    // Tab switching logic
+    document.querySelectorAll(".nav-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".nav-tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+        btn.classList.add("active");
+        const tabId = btn.getAttribute("data-tab");
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) activeTab.style.display = "block";
+        document.getElementById("pageTitle").textContent = btn.textContent.trim().replace(/^[^a-zA-Z]+/, "");
+
+        // Lazy load data for selected tab
+        if (tabId === "tabOverview") loadStats();
+        else if (tabId === "tabTimings") loadCollegeInfo();
+        else if (tabId === "tabCutoffs") loadCutoffs();
+        else if (tabId === "tabKnowledge") loadKnowledge();
+        else if (tabId === "tabPages") loadPagesAndDocs();
+      });
+    });
+
+    // Helper Modal Controls
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+    }
+
+    // Load Stats
+    async function loadStats() {
+      try {
+        const res = await fetch("/api/admin/stats");
+        const data = await res.json();
+        document.getElementById("statPages").textContent = data.total_pages;
+        document.getElementById("statPDFs").textContent = data.total_pdfs;
+        document.getElementById("statKnowledge").textContent = data.total_knowledge;
+        document.getElementById("statCutoffs").textContent = data.total_cutoffs;
+        document.getElementById("statChats").textContent = data.total_chats;
+        document.getElementById("statLastCrawl").textContent = data.last_crawl;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Load College Info
+    async function loadCollegeInfo() {
+      try {
+        const res = await fetch("/api/admin/college-info");
+        const data = await res.json();
+        document.getElementById("info_college_timing").value = data.college_timing || "";
+        document.getElementById("info_office_timing").value = data.office_timing || "";
+        document.getElementById("info_library_timing").value = data.library_timing || "";
+        document.getElementById("info_exam_office_timing").value = data.exam_office_timing || "";
+        document.getElementById("info_admission_office_timing").value = data.admission_office_timing || "";
+        document.getElementById("info_college_phone").value = data.college_phone || "";
+        document.getElementById("info_college_email").value = data.college_email || "";
+        document.getElementById("info_tpo_email").value = data.tpo_email || "";
+        document.getElementById("info_college_address").value = data.college_address || "";
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Save College Info
+    document.getElementById("btnSaveCollegeInfo").addEventListener("click", async () => {
+      const payload = {
+        college_timing: document.getElementById("info_college_timing").value,
+        office_timing: document.getElementById("info_office_timing").value,
+        library_timing: document.getElementById("info_library_timing").value,
+        exam_office_timing: document.getElementById("info_exam_office_timing").value,
+        admission_office_timing: document.getElementById("info_admission_office_timing").value,
+        college_phone: document.getElementById("info_college_phone").value,
+        college_email: document.getElementById("info_college_email").value,
+        tpo_email: document.getElementById("info_tpo_email").value,
+        college_address: document.getElementById("info_college_address").value
+      };
+
+      const res = await fetch("/api/admin/college-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const resData = await res.json();
+      alert(resData.message);
+    });
+
+    // Crawler Handlers
+    const btnStartCrawl = document.getElementById("btnStartCrawl");
+    const btnUpdateData = document.getElementById("btnUpdateData");
+    const btnStopCrawl = document.getElementById("btnStopCrawl");
+    const crawlerLiveMsg = document.getElementById("crawlerLiveMsg");
+
+    let crawlerPollInterval = null;
+
+    btnStartCrawl.addEventListener("click", async () => {
+      const res = await fetch("/api/admin/crawler/start", { method: "POST" });
+      const data = await res.json();
+      alert(data.message);
+      startCrawlerPolling();
+    });
+
+    btnUpdateData.addEventListener("click", async () => {
+      const res = await fetch("/api/admin/crawler/update", { method: "POST" });
+      const data = await res.json();
+      alert(data.message);
+      startCrawlerPolling();
+    });
+
+    btnStopCrawl.addEventListener("click", async () => {
+      const res = await fetch("/api/admin/crawler/stop", { method: "POST" });
+      const data = await res.json();
+      alert(data.message);
+    });
+
+    function startCrawlerPolling() {
+      if (crawlerPollInterval) clearInterval(crawlerPollInterval);
+      btnStopCrawl.style.display = "inline-block";
+
+      crawlerPollInterval = setInterval(async () => {
+        const res = await fetch("/api/admin/crawler/status");
+        const status = await res.json();
+        crawlerLiveMsg.textContent = status.message;
+
+        if (status.state === "completed" || status.state === "stopped" || status.state === "error") {
+          clearInterval(crawlerPollInterval);
+          btnStopCrawl.style.display = "none";
+          loadStats();
+        }
+      }, 1500);
+    }
+
+    // Cutoffs Table
+    async function loadCutoffs() {
+      const res = await fetch("/api/admin/cutoffs");
+      const data = await res.json();
+      const tbody = document.getElementById("cutoffsTableBody");
+      tbody.innerHTML = "";
+
+      data.cutoffs.forEach(c => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${c.academic_year}</strong></td>
+          <td>${c.branch}</td>
+          <td>Round ${c.cap_round}</td>
+          <td><span class="badge badge-primary">${c.category}</span></td>
+          <td>${c.cutoff_type}</td>
+          <td><strong style="color: var(--accent-secondary);">${c.cutoff_value}</strong></td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteCutoff(${c.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("btnOpenAddCutoff").addEventListener("click", () => {
+      document.getElementById("cutoffModalTitle").textContent = "Add Cutoff Record";
+      document.getElementById("cutoff_id").value = "";
+      document.getElementById("cutoff_branch").value = "";
+      document.getElementById("cutoff_value").value = "";
+      document.getElementById("cutoffModal").classList.add("show");
+    });
+
+    document.getElementById("btnSaveCutoff").addEventListener("click", async () => {
+      const payload = {
+        academic_year: document.getElementById("cutoff_year").value,
+        cap_round: document.getElementById("cutoff_round").value,
+        branch: document.getElementById("cutoff_branch").value,
+        category: document.getElementById("cutoff_category").value,
+        cutoff_type: document.getElementById("cutoff_type").value,
+        cutoff_value: document.getElementById("cutoff_value").value,
+        source_url: document.getElementById("cutoff_source_url").value
+      };
+
+      await fetch("/api/admin/cutoffs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      closeModal("cutoffModal");
+      loadCutoffs();
+    });
+
+    async function deleteCutoff(id) {
+      if (confirm("Delete this cutoff record?")) {
+        await fetch(`/api/admin/cutoffs?id=${id}`, { method: "DELETE" });
+        loadCutoffs();
+      }
+    }
+
+    // Knowledge Table
+    async function loadKnowledge() {
+      const res = await fetch("/api/admin/knowledge");
+      const data = await res.json();
+      const tbody = document.getElementById("knowledgeTableBody");
+      tbody.innerHTML = "";
+
+      data.knowledge.forEach(k => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${k.question}</strong></td>
+          <td><code>${k.category}</code></td>
+          <td style="color: var(--text-muted);">${k.keyword}</td>
+          <td><span class="badge badge-success">Verified</span></td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="deleteKnowledge(${k.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("btnOpenAddKnowledge").addEventListener("click", () => {
+      document.getElementById("knowledgeModalTitle").textContent = "Add Verified Knowledge";
+      document.getElementById("knowledge_id").value = "";
+      document.getElementById("know_question").value = "";
+      document.getElementById("know_category").value = "";
+      document.getElementById("know_keyword").value = "";
+      document.getElementById("know_answer").value = "";
+      document.getElementById("knowledgeModal").classList.add("show");
+    });
+
+    document.getElementById("btnSaveKnowledge").addEventListener("click", async () => {
+      const payload = {
+        question: document.getElementById("know_question").value,
+        category: document.getElementById("know_category").value,
+        department: document.getElementById("know_department").value || null,
+        academic_year: document.getElementById("know_year").value || "2025-26",
+        keyword: document.getElementById("know_keyword").value,
+        answer: document.getElementById("know_answer").value,
+        source_url: document.getElementById("know_source_url").value,
+        verified: 1
+      };
+
+      await fetch("/api/admin/knowledge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      closeModal("knowledgeModal");
+      loadKnowledge();
+    });
+
+    async function deleteKnowledge(id) {
+      if (confirm("Delete this verified knowledge entry?")) {
+        await fetch(`/api/admin/knowledge?id=${id}`, { method: "DELETE" });
+        loadKnowledge();
+      }
+    }
+
+    // Load Pages & Documents
+    async function loadPagesAndDocs() {
+      const pRes = await fetch("/api/admin/pages");
+      const pData = await pRes.json();
+      const pBody = document.getElementById("pagesTableBody");
+      pBody.innerHTML = "";
+      (pData.pages || []).slice(0, 50).forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${p.title}</strong></td>
+          <td><span class="badge badge-primary">${p.category}</span></td>
+          <td><a href="${p.url}" target="_blank" style="color: var(--accent-secondary); text-decoration: none;">${p.url}</a></td>
+          <td style="color: var(--text-muted);">${p.last_crawled}</td>
+        `;
+        pBody.appendChild(tr);
+      });
+
+      const dRes = await fetch("/api/admin/documents");
+      const dData = await dRes.json();
+      const dBody = document.getElementById("docsTableBody");
+      dBody.innerHTML = "";
+      (dData.documents || []).slice(0, 50).forEach(d => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${d.title}</strong></td>
+          <td><a href="${d.url}" target="_blank" style="color: var(--accent-secondary); text-decoration: none;">${d.url}</a></td>
+          <td style="color: var(--text-muted);">${d.last_crawled}</td>
+        `;
+        dBody.appendChild(tr);
+      });
+    }
+
+    // Initial load
+    loadStats();
+  </script>
+</body>
+</html>

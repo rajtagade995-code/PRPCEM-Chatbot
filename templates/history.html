@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat History - PRPCEM College Assistant</title>
+  <link rel="icon" href="/static/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .history-page-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .history-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+    }
+    .session-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+  <header class="chatbot-header">
+    <div class="header-left">
+      <div class="college-emblem">
+        <img src="/static/images/logo.svg" alt="PRPCEM">
+      </div>
+      <div class="header-titles">
+        <h1>PRPCEM Conversation History</h1>
+        <div class="subtitle">Review Previous Student Queries</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="/" class="btn btn-primary" style="text-decoration: none;">← Open Chat</a>
+    </div>
+  </header>
+
+  <main class="history-page-container">
+    <div id="sessionsContainer">Loading conversations...</div>
+  </main>
+
+  <script src="/static/js/theme.js"></script>
+  <script>
+    async function loadSessions() {
+      const container = document.getElementById("sessionsContainer");
+      try {
+        const res = await fetch("/api/history");
+        const data = await res.json();
+        const sessions = data.sessions || [];
+
+        if (sessions.length === 0) {
+          container.innerHTML = '<div class="history-card" style="text-align: center; color: var(--text-muted);">No chat history recorded yet.</div>';
+          return;
+        }
+
+        let html = "";
+        for (const s of sessions) {
+          html += `
+            <div class="history-card">
+              <div class="session-head">
+                <div>
+                  <strong>Session: ${s.session_id}</strong>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${s.last_activity} (${s.message_count} messages)</div>
+                </div>
+                <button class="btn btn-secondary" onclick="viewSession('${s.session_id}')">Load in Chat</button>
+              </div>
+              <div style="font-size: 0.88rem; color: var(--text-secondary);">
+                Initial Query: "<em>${escapeHtml(s.first_message || '')}</em>"
+              </div>
+            </div>
+          `;
+        }
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '<div class="history-card" style="color: var(--danger-color);">Failed to load history.</div>';
+      }
+    }
+
+    function viewSession(sessId) {
+      sessionStorage.setItem("prpcem_session_id", sessId);
+      window.location.href = "/";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadSessions();
+  </script>
+</body>
+</html>
