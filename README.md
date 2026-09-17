@@ -293,7 +293,7 @@ Engineered with 100% free, open-source traditional programming (Zero ML / No Pai
 https://prpcem-chatbot.onrender.com/
 
 ## student information**
-**name:-Raj Sushil Tgadae.**
+**name**:Raj Sushil Tgadae.
 **class:-B.**
 **Roll no.MLU24F119.**
 **Project name:-PRPCEM College Assistant**
